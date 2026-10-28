@@ -34,7 +34,7 @@ No server, no dependencies: only Markdown files and one skill.
 | `code` | writing or changing software; the agent writes the code (KISS, minimal diffs, no new dependencies without asking, honest check results) |
 | `embedded` | microcontroller firmware; use with `code` (no heap in ISRs, `built ✓, needs HW test`, ask before flashing) |
 | `learning` | you write the code to learn it; the agent teaches step by step and does not touch your code |
-| `docs` | CV, letters, reports, presentations (keep the document's language, never invent facts) |
+| `docs` | CV, letters, reports, presentations (keep the document's language, never invent facts, review by Gemini/Codex when other agents can be called) |
 
 Edit them freely; they are your rules.
 
