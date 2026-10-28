@@ -23,7 +23,7 @@ No server, no dependencies: only Markdown files and one skill.
 ```
 
 - **Core vs. profiles.** USER.md holds only what is true everywhere. Coding rules don't leak into your CV, and document rules don't leak into your firmware.
-- **Picking profiles.** A project names its profiles in AGENTS.md (`Profiles: code, embedded, learning`). Without a project (e.g. a quick session to edit a document), the agent picks one from the index in USER.md, or asks.
+- **Picking profiles.** A project names its profiles in AGENTS.md (`Profiles: code, embedded, learning`). Claude Code also gets them as `@` imports in CLAUDE.md (it asks once per project to allow imports from outside the repository); other agents read the files at session start. Without a project (e.g. a quick session to edit a document), the agent picks one from the index in USER.md, or asks.
 - **New kinds of work.** If no profile fits, setup asks up to five questions and drafts a new profile. After that, when you correct the agent on something that applies to all work of that kind, it proposes adding the rule to the profile.
 - **Recovery.** On "continue", the agent compares git history with WORK.md. Commits or uncommitted changes that WORK.md does not record mean the last session was interrupted. The agent matches them to the plan, marks them unverified, re-runs the checks and tells you.
 

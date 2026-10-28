@@ -55,7 +55,7 @@ Present the findings in one list with sources, and ask for confirmation once.
    4. What must the agent never do, or always ask first?
    5. Anything you often have to correct agents about in this kind of work?
    Draft `~/.agents/profiles/<short-name>.md` from the answers: `# Profile: <name>`, a `When:` line, then only the rules the answers support, as short bullets. Show it, write it after approval, and add one line for it to the index in USER.md › Profiles. Tell the user: "This profile is a first draft. Whenever you correct me on something that applies to all work of this kind, I will propose adding it here."
-4. Write the chosen names into AGENTS.md › Project as `Profiles: <names>`. For Claude Code, add `@~/.agents/profiles/<name>.md` to CLAUDE.md for each profile, below `@AGENTS.md`.
+4. Write the chosen names into AGENTS.md › Project as `Profiles: <names>`. For Claude Code, add `@~/.agents/profiles/<name>.md` to CLAUDE.md for each profile, below `@AGENTS.md`. Tell the user that Claude Code asks once per project to allow these imports from outside the repository; until they allow it, the agent reads the profiles with a tool instead.
 
 ## Step 4 — Questions (ask only what is still unknown, in this order)
 1. Purpose: what the project is, who uses it, its stage (prototype / active / production / maintenance). → AGENTS.md › Project
