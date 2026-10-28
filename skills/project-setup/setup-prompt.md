@@ -11,7 +11,7 @@ Decide the mode yourself, then tell the user in one line:
 - **new**: the repo has little or no source code.
 - **existing**: there is code or documentation, and `docs/WORK.md` does not exist.
 - **resume**: `TODO(setup)` markers exist in AGENTS.md, docs/WORK.md or docs/PROJECT.md → continue from the first unanswered item; never re-ask answered items.
-- **update**: agent-lite files exist and the user asked to update → replace only the text between `<!-- agent-lite:protocol v… -->` and `<!-- /agent-lite:protocol -->` in AGENTS.md with the current template, show the diff, and stop. If AGENTS.md has a `Learning mode: on` line (v1), offer to replace it with `learning` in the `Profiles:` line.
+- **update**: agent-lite files exist and the user asked to update → replace only the text between `<!-- agent-lite:protocol v… -->` and `<!-- /agent-lite:protocol -->` in AGENTS.md with the current template: show the diff, apply it after approval, and stop. If AGENTS.md has a `Learning mode: on` line (v1), offer to replace it with `learning` in the `Profiles:` line.
 - **preferences**: the user asked to change their preferences → run Step 1 only.
 - **profile**: the user asked to create or change a profile → run Step 3 only (no repository needed).
 
@@ -20,7 +20,7 @@ Decide the mode yourself, then tell the user in one line:
 2. Never rewrite existing content in AGENTS.md, CLAUDE.md, USER.md, profiles or other instruction files. Add sections; show a diff before changing any existing file and wait for approval.
 3. Ask one question per message. Put your recommended option first, marked "(recommended)". Accept "you decide" (= recommended) and "skip" (= recorded as an open question). Never ask for secrets; ask only where credentials come from.
 4. Never ask what you can read from the repo. Show what you inferred, with its source (file or command), and ask for one confirmation.
-5. Write each answer into its target file right after it is given, so an interrupted setup can resume from the remaining `TODO(setup)` markers.
+5. Before the first project question, create any missing agent-lite files from the templates. Write each answer into its target file right after it is given, so an interrupted setup can resume from the remaining `TODO(setup)` markers.
 6. If the folder is not a git repository, recommend `git init` and ask. Crash recovery depends on git.
 7. Profiles and USER.md hold general rules only. Project facts (commands, paths, hardware) go into AGENTS.md or docs/PROJECT.md.
 
@@ -86,7 +86,7 @@ Use the templates below.
 - **Finishing:** fill every `TODO(setup)` you have an answer for. Move unanswered items to WORK.md › Open questions and delete their markers. In WORK.md › Next, put "Confirm open questions" or the user's first task.
 
 ## Step 6 — Finish
-- Check that AGENTS.md, docs/WORK.md and docs/PROJECT.md exist, that every profile in the `Profiles:` line exists in `~/.agents/profiles/`, and that no `TODO(setup)` markers remain.
+- Check that AGENTS.md, docs/WORK.md and docs/PROJECT.md exist, that every profile in the `Profiles:` line exists in `~/.agents/profiles/`, and that no `TODO(setup)` markers remain. A listed profile that is missing: offer to create it with the Step 3 interview, or to remove it from the line.
 - Show the user: the decisions taken (and whether each was inferred or answered), the profiles used or created, the files created or changed, and the open questions.
 - Suggest a commit (`chore: add agent-lite working files`) and wait for approval if the Git rules require it.
 
@@ -131,6 +131,7 @@ Profiles: <!-- TODO(setup): names from ~/.agents/profiles, e.g. code, embedded -
 - [embedded] For firmware, add memory use: `built ✓ (flash 41.2/64 KB, RAM 9.8/20 KB)`.
 - `needs HW test` — [embedded] only real hardware can prove it. Write `built ✓, needs HW test`, and never assume it works on the board.
 - `HW verified (<who>, <date>)` — [embedded] only if the user reported the result on hardware, or you ran an on-target test the user approved and saw its output.
+- `failed: <command> ✗` — it ran and failed; quote the relevant output.
 - `unverified (<reason>)` — not checked.
 <!-- TODO(setup): [embedded] how hardware testing is done (E6) -->
 
@@ -142,14 +143,14 @@ Profiles: <!-- TODO(setup): names from ~/.agents/profiles, e.g. code, embedded -
 - [embedded] flashing or programming a board, erasing flash, debug-probe writes (openocd, st-flash, STM32_Programmer_CLI, pyocd, J-Link, esptool, idf.py flash, dfu-util, west flash)
 - [embedded] option bytes, fuses, read-out protection, bootloader changes (may be irreversible)
 - [embedded] changing pin, clock or peripheral configuration (.ioc, clock tree, pinmux, device tree, linker-script memory regions)
-<!-- TODO(setup): project-specific additions (question 3) -->
+<!-- TODO(setup): project-specific additions (question 2) -->
 
 ## Conventions
-<!-- TODO(setup): only rules that tools do not enforce (questions 5 and 7) -->
+<!-- TODO(setup): only rules that tools and profiles do not cover (questions 4 and 6) -->
 - [embedded] Generated code: edit only between `/* USER CODE BEGIN … */` and `/* USER CODE END … */` (or the boundary recorded in PROJECT.md); everything else is overwritten on regeneration.
 
 ## Git
-<!-- TODO(setup): only if different from the user profile (question 8) -->
+<!-- TODO(setup): only if different from USER.md (question 7) -->
 
 ## Map
 - Current work, next steps, dead ends: `docs/WORK.md`
@@ -251,10 +252,10 @@ Change only with the user's consent. Lives at ~/.agents/USER.md. -->
 
 ## Profiles
 - A project lists its profiles in AGENTS.md (`Profiles: code, embedded`). Read each from `~/.agents/profiles/<name>.md` before starting.
-- No project or no `Profiles:` line: pick the profile that fits the task from the index below. If unsure, ask. If none fits, use this core only.
+- No project or no `Profiles:` line: pick the profile that fits the task from the index below. If unsure, ask. If none fits, use this core only; if this kind of work will repeat, offer to create a profile for it.
 - When my feedback would apply to every task of a profile, propose adding it to that profile (show the change, wait for my OK).
 
-Index:
+Index (one line per installed profile):
 - code — writing or changing software; the agent writes the code
 - embedded — microcontroller firmware; use with code
 - learning — I do the work to learn it; the agent teaches

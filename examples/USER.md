@@ -19,10 +19,10 @@ Change only with the user's consent. Lives at ~/.agents/USER.md. -->
 
 ## Profiles
 - A project lists its profiles in AGENTS.md (`Profiles: code, embedded`). Read each from `~/.agents/profiles/<name>.md` before starting.
-- No project or no `Profiles:` line: pick the profile that fits the task from the index below. If unsure, ask. If none fits, use this core only.
+- No project or no `Profiles:` line: pick the profile that fits the task from the index below. If unsure, ask. If none fits, use this core only; if this kind of work will repeat, offer to create a profile for it.
 - When my feedback would apply to every task of a profile, propose adding it to that profile (show the change, wait for my OK).
 
-Index:
+Index (one line per installed profile):
 - code — writing or changing software; the agent writes the code
 - embedded — microcontroller firmware; use with code
 - learning — I do the work to learn it; the agent teaches

@@ -7,5 +7,5 @@ When: writing or changing software (apps, tools, scripts, firmware). The agent w
 - Minimal diffs. Keep the existing architecture and style; do not refactor working code only to match these rules. Suggest out-of-scope improvements instead of making them.
 - No new dependencies without asking.
 - Explain the reason for important design choices in 1–2 sentences.
-- Report every check as `verified: <command> ✓`, `built ✓`, failed (with the output) or `not run (<reason>)`. A pass before later edits does not count.
+- Report every check as `verified: <command> ✓`, `built ✓`, `failed: <command> ✗` (quote the output) or `not run (<reason>)`. A pass before later edits does not count.
 - These are defaults: use a more complex construct when requirements, the existing architecture, safety or a measurable benefit justify it, and say why.
