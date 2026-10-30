@@ -1,6 +1,6 @@
-# agent-lite setup (v2)
+# agent-lite setup (v3)
 
-You are installing **agent-lite** into the current repository: a small set of files that lets any coding agent continue this project across sessions and tools. Talk to the user in their language (see `~/.agents/USER.md` if it exists; otherwise use the language of their messages). Agent files (AGENTS.md, docs/WORK.md, docs/PROJECT.md) are written in English unless USER.md says otherwise; section headings and labels always stay in English.
+You are installing **agent-lite** into the current repository: a small set of files that lets any AI agent continue this project across sessions and tools. Talk to the user in their language (see `~/.agents/USER.md` if it exists; otherwise use the language of their messages). Agent files (AGENTS.md, docs/WORK.md, docs/PROJECT.md) are written in English unless USER.md says otherwise; section headings and labels always stay in English.
 
 Preferences come in two layers, both outside the repository:
 - `~/.agents/USER.md` — the core: language, reports, autonomy, git. Applies to every session.
@@ -12,8 +12,8 @@ Decide the mode yourself, then tell the user in one line:
 - **existing**: there is code or documentation, and `docs/WORK.md` does not exist.
 - **resume**: `TODO(setup)` markers exist in AGENTS.md, docs/WORK.md or docs/PROJECT.md → continue from the first unanswered item; never re-ask answered items.
 - **update**: agent-lite files exist and the user asked to update → replace only the text between `<!-- agent-lite:protocol v… -->` and `<!-- /agent-lite:protocol -->` in AGENTS.md with the current template: show the diff, apply it after approval, and stop. If AGENTS.md has a `Learning mode: on` line (v1), offer to replace it with `learning` in the `Profiles:` line.
-- **preferences**: the user asked to change their preferences → run Step 1 only.
-- **profile**: the user asked to create or change a profile → run Step 3 only (no repository needed).
+- **preferences**: the user asked to change their preferences → run Steps 0 and 1 only.
+- **profile**: the user asked to create or change a profile → run Steps 0 and 3 only (no repository needed).
 
 ## Hard rules
 1. Never modify source code, build files, CI, dependency manifests or generator project files (e.g. `.ioc`) during setup.
@@ -23,6 +23,9 @@ Decide the mode yourself, then tell the user in one line:
 5. Before the first project question, create any missing agent-lite files from the templates. Write each answer into its target file right after it is given, so an interrupted setup can resume from the remaining `TODO(setup)` markers.
 6. If the folder is not a git repository, recommend `git init` and ask. Crash recovery depends on git.
 7. Profiles and USER.md hold general rules only. Project facts (commands, paths, hardware) go into AGENTS.md or docs/PROJECT.md.
+
+## Step 0 — Bundled profiles (every mode)
+If this skill's folder contains `profiles/`, copy each file to `~/.agents/profiles/` (create the folder if missing) only if no file with that name exists there. Never overwrite a profile. Say in one line what was added and what was kept. If you received this prompt without the skill folder, skip this step; Step 3 can create profiles through the interview.
 
 ## Step 1 — User preferences (only if `~/.agents/USER.md` is missing, or in preferences mode)
 Ask, one at a time:
