@@ -36,11 +36,12 @@ If `~/.agents/USER.md` exists without the agent-lite title, it is not ours: do n
 Ask, one at a time:
 1. Language: for talking to you, and for prose in agent files (recommended: your language for conversation, English for agent files).
 2. Report style: short bullets with one result line per check (recommended) / detailed / minimal.
-3. Autonomy: do routine work alone and ask only for the "Always ask first" list (recommended) / ask before any change outside the agreed plan.
+3. Autonomy: ask before any change outside the agreed plan (recommended) / do routine work alone and ask only for the "Always ask first" list.
 4. Git: commit locally after each completed plan step on a feature branch, never push without asking (recommended) / never commit, the user commits / ask before every commit.
-5. Shell for the commands you give them (e.g. Windows PowerShell, bash).
+5. Review pace, so the user can follow the work: report every step and stop at the end of the task (recommended) / stop for the user's OK after every step / report only at the end of the task.
+6. Shell for the commands you give them (e.g. Windows PowerShell, bash).
 
-Build USER.md from the template at the end of this file; in its Profiles index, list only the profiles that exist in `~/.agents/profiles/`. Show it and ask for approval. Then write it, and with approval link it for the platforms the user uses:
+Build USER.md from the template at the end of this file. The template already holds the recommended answers; change a line only if the user chose differently. In its Profiles index, list only the profiles that exist in `~/.agents/profiles/`. Show it and ask for approval. Then write it, and with approval link it for the platforms the user uses:
 - Claude Code: append `@~/.agents/USER.md` to `~/.claude/CLAUDE.md` (create the file if missing; keep existing content).
 - Codex: in `~/.codex/AGENTS.md`, between `<!-- agent-lite:user -->` and `<!-- /agent-lite:user -->` (keep other content), write: "Before your first reply in every session, read `<absolute path to ~/.agents/USER.md>` and follow it. If the project's AGENTS.md has a `Profiles:` line, also read each listed profile from `<absolute path to ~/.agents/profiles>/<name>.md`." If `~/.codex/AGENTS.override.md` exists, warn that it hides AGENTS.md.
 - Gemini CLI: append `@<absolute path to ~/.agents/USER.md>` to `~/.gemini/GEMINI.md`.
@@ -133,8 +134,8 @@ Profiles: <!-- TODO(setup): names from ~/.agents/profiles, e.g. code, embedded -
 - **"Continue" (or the same in the user's language).** Read `docs/WORK.md`. Run `git status --short`, `git log --oneline -10` and `git log -1 --format="%h %cr" -- docs/WORK.md`. Commits after WORK.md's last commit plus uncommitted changes are work that WORK.md does not record yet. If WORK.md has no commit yet, consider only uncommitted changes. If WORK.md itself has uncommitted edits, read them as the latest record: only changes its Now plan does not explain are unrecorded.
 - **Recovery.** If such unrecorded work exists, the previous session was cut off. Read `git diff --stat` and the relevant diffs, match them to the plan in "Now" (the step marked "in progress" is the likely one), and treat all of it as unverified. Run the checks, update WORK.md (mark "(recovered)"), and tell the user what you found before continuing. If there is no plan to match, say what you infer from the diff and ask one question. Never discard, reset or stash uncommitted work without asking.
 - **Load little.** Do not read all docs. Read only the section of `docs/PROJECT.md` that the task needs.
-- **Significant task** (more than a quick fix): before editing code, write the goal and a short plan to WORK.md › Now. When you start a step, mark it "(in progress)".
-- **Step done.** Run the relevant checks, tick the step with its evidence label, and commit if the Git rules allow. Quick fixes need no WORK.md update.
+- **Significant task** (more than a quick fix): before editing, write the goal and a short plan to WORK.md › Now. When you start a step, mark it "(in progress)".
+- **Step done.** Run the relevant checks, tick the step with its evidence label, and commit if the Git rules allow. Then write the step report: the commit (or "uncommitted"), files changed, why, and how the user can check it. USER.md › Review says when to report and when to stop for the user's OK; without that section, report and continue. Quick fixes need no WORK.md update and no report.
 - **Dead ends.** When you abandon an approach, add it to WORK.md › Dead ends with the reason. Check Dead ends before proposing an approach.
 - **Task done.** Move it to Done with evidence, choose Next[1] or ask the user, and keep WORK.md within its size rule.
 - **Knowledge.** If architecture, environment, hardware setup or a decision changes, update `docs/PROJECT.md` in the same change. If code and a document disagree, the code wins; fix the document.
@@ -274,6 +275,9 @@ Change only with the user's consent. Lives at ~/.agents/USER.md. -->
 
 ## Autonomy
 - Ask before any change outside the agreed plan. Reading, searching, building and running tests need no approval.
+
+## Review
+- Report every completed plan step; stop for my OK at the end of the task.
 
 ## Git (only in git repositories)
 - Commit locally on a feature branch after each completed plan step. Never push without asking.

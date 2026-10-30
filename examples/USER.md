@@ -13,6 +13,9 @@ Change only with the user's consent. Lives at ~/.agents/USER.md. -->
 ## Autonomy
 - Ask before any change outside the agreed plan. Reading, searching, building and running tests need no approval.
 
+## Review
+- Report every completed plan step; stop for my OK at the end of the task.
+
 ## Git (only in git repositories)
 - Commit locally on a feature branch after each completed plan step. Never push without asking.
 - Commits and PRs in my name only; no AI co-author or "Generated with" lines.
