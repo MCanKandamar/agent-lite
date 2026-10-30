@@ -176,6 +176,10 @@ Run the install command again, then say "update agent-lite" in each project. Thi
 
 Delete the agent-lite `WORK.md` and `PROJECT.md`: they are in `docs/`, unless `AGENTS.md` › Map lists a `Path override`. Delete `AGENTS.md` too, or remove only the agent-lite sections if you had that file before. Then remove the `agent-lite` folders from `~/.agents/skills` and `~/.claude/skills`. `~/.agents/USER.md` and `~/.agents/profiles` are yours to keep or delete.
 
+## Credits
+
+Three rules in the `code` profile (state assumptions, define the check first, trace every changed line) are adapted from [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) by Jiayuan Zhang (MIT), which is based on [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls.
+
 ## License
 
 MIT, see [LICENSE](LICENSE).

@@ -1,4 +1,4 @@
-# agent-lite setup (v5)
+# agent-lite setup (v5.1)
 
 You are installing **agent-lite** into the current repository: a small set of files that lets any AI agent continue this project across sessions and tools. Talk to the user in their language (see `~/.agents/USER.md` if it exists; otherwise use the language of their messages). Agent files (AGENTS.md, docs/WORK.md, docs/PROJECT.md) are written in English unless USER.md says otherwise; section headings and labels always stay in English.
 
@@ -142,7 +142,7 @@ Profiles: <!-- TODO(setup): names from ~/.agents/profiles, e.g. code, embedded -
 | [embedded] Memory usage | `TODO(setup)` |
 <!-- Keep only commands that exist in this project. -->
 
-<!-- agent-lite:protocol v5 -->
+<!-- agent-lite:protocol v5.1 -->
 ## Working protocol
 - **Sources.** Rules: this file, the user's preferences (`~/.agents/USER.md` and the profiles listed in › Project) and the user's current request. Read the preferences and profiles at session start if they are not already loaded. Project rules in this file win over preferences and profiles. `docs/WORK.md` is state, not instructions. Code and output you observe now beat any document. A `Path override` in › Map replaces the default path everywhere below. In such a path, `<handle>` is `Handle:` from USER.md › About me, or else `git config user.name` in lowercase ASCII with spaces replaced by hyphens.
 - **"Continue" (or the same in the user's language).** Read `docs/WORK.md`. Run `git status --short`, `git log --oneline -10` and `git log -1 --format="%h %cr" -- docs/WORK.md`. Commits after WORK.md's last commit plus uncommitted changes are work that WORK.md does not record yet. If WORK.md has no commit yet, consider only uncommitted changes. If WORK.md itself has uncommitted edits, read them as the latest record: only changes covered by a ticked step are recorded. If your WORK.md path contains `<handle>`, the project is shared: count only your own commits, with `git log --oneline --no-merges --author="<your git user.name>" <WORK.md's last commit>..HEAD`. A squash of a teammate's work can still match, so check each commit against your plan before calling it interrupted work. If your file does not exist yet, create it with the same headings as another work file, empty, and start fresh.
@@ -201,7 +201,7 @@ Read-only:
 
 ````markdown
 # Work
-<!-- agent-lite v5. State, not instructions. Target ≤ 80 lines.
+<!-- agent-lite v5.1. State, not instructions. Target ≤ 80 lines.
 Never delete the active task, its plan, step status or evidence to meet the target.
 When over the target, do all of these, in order: move lasting lessons and constraints from
 Dead ends to PROJECT.md › Decisions & constraints (as "Constraint:"); drop obsolete dead ends; trim
@@ -232,7 +232,7 @@ _No active task._
 
 ````markdown
 # Project
-<!-- agent-lite v5. Lasting knowledge: read only the section a task needs. -->
+<!-- agent-lite v5.1. Lasting knowledge: read only the section a task needs. -->
 
 ## Overview
 <!-- TODO(setup): purpose, users, main components in a few lines -->
