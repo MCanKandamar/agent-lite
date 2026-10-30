@@ -6,10 +6,12 @@ Preferences come in two layers, both outside the repository:
 - `~/.agents/USER.md` — the core: language, reports, autonomy, git. Applies to every session.
 - `~/.agents/profiles/<name>.md` — one file per kind of work (e.g. `code`, `embedded`, `learning`, `docs`). A project lists the profiles it uses in AGENTS.md › Project as `Profiles: code, embedded`. Each profile starts with `# Profile: <name>` and a `When:` line that says what kind of work it is for.
 
+A file belongs to agent-lite only if it carries a marker: `<!-- agent-lite` in its text, the title `# User preferences (agent-lite)`, or, for docs/WORK.md and docs/PROJECT.md, a protocol block in the repo's AGENTS.md. Any other file belongs to the user or to another system.
+
 ## Modes
 Decide the mode yourself, then tell the user in one line:
 - **new**: the repo has little or no source code.
-- **existing**: there is code or documentation, and `docs/WORK.md` does not exist.
+- **existing**: there is code or documentation, and AGENTS.md has no `<!-- agent-lite:protocol` block.
 - **resume**: `TODO(setup)` markers exist in AGENTS.md, docs/WORK.md or docs/PROJECT.md → continue from the first unanswered item; never re-ask answered items.
 - **update**: agent-lite files exist and the user asked to update → replace only the text between `<!-- agent-lite:protocol v… -->` and `<!-- /agent-lite:protocol -->` in AGENTS.md with the current template: show the diff, apply it after approval, and stop. If AGENTS.md has a `Learning mode: on` line (v1), offer to replace it with `learning` in the `Profiles:` line.
 - **preferences**: the user asked to change their preferences → run Steps 0 and 1 only.
@@ -21,13 +23,16 @@ Decide the mode yourself, then tell the user in one line:
 3. Ask one question per message. Put your recommended option first, marked "(recommended)". Accept "you decide" (= recommended) and "skip" (= recorded as an open question). Never ask for secrets; ask only where credentials come from.
 4. Never ask what you can read from the repo. Show what you inferred, with its source (file or command), and ask for one confirmation.
 5. Before the first project question, create any missing agent-lite files from the templates. Write each answer into its target file right after it is given, so an interrupted setup can resume from the remaining `TODO(setup)` markers.
-6. If the folder is not a git repository, recommend `git init` and ask. Crash recovery depends on git.
+6. If the folder is not a git repository, recommend `git init` and ask. Crash recovery depends on git. If the work is mostly binary files (CAD, images, Office files), tell the user that git shows which files changed but not what changed inside them, so WORK.md step status matters more.
 7. Profiles and USER.md hold general rules only. Project facts (commands, paths, hardware) go into AGENTS.md or docs/PROJECT.md.
+8. Setup only adds. Never overwrite, rename, migrate or disable another system's files or settings. Setup must be safe to run twice: before adding a line, section or link, check that it is not already there.
 
 ## Step 0 — Bundled profiles (every mode)
 If this skill's folder contains `profiles/`, copy each file to `~/.agents/profiles/` (create the folder if missing) only if no file with that name exists there. Never overwrite a profile. Say in one line what was added and what was kept. If you received this prompt without the skill folder, skip this step; Step 3 can create profiles through the interview.
 
 ## Step 1 — User preferences (only if `~/.agents/USER.md` is missing, or in preferences mode)
+If `~/.agents/USER.md` exists without the agent-lite title, it is not ours: do not touch it, use `~/.agents/agent-lite/USER.md` in its place everywhere below, and tell the user in one line. Skip this step if that file already exists.
+
 Ask, one at a time:
 1. Language: for talking to you, and for prose in agent files (recommended: your language for conversation, English for agent files).
 2. Report style: short bullets with one result line per check (recommended) / detailed / minimal.
@@ -40,13 +45,21 @@ Build USER.md from the template at the end of this file; in its Profiles index, 
 - Codex: in `~/.codex/AGENTS.md`, between `<!-- agent-lite:user -->` and `<!-- /agent-lite:user -->` (keep other content), write: "Before your first reply in every session, read `<absolute path to ~/.agents/USER.md>` and follow it. If the project's AGENTS.md has a `Profiles:` line, also read each listed profile from `<absolute path to ~/.agents/profiles>/<name>.md`." If `~/.codex/AGENTS.override.md` exists, warn that it hides AGENTS.md.
 - Gemini CLI: append `@<absolute path to ~/.agents/USER.md>` to `~/.gemini/GEMINI.md`.
 - Cursor / Copilot: they have no user-level file; give the user the text to paste into their settings.
+- Any other agent that reads AGENTS.md needs no link: the Working protocol tells it to read USER.md and the profiles.
 
 ## Step 2 — Inspect the project (read-only)
 Read only what is needed: README; manifests and build files (package.json, pyproject.toml, Cargo.toml, go.mod, CMakeLists.txt, Makefile, *.csproj, platformio.ini); lint/format configs; CI files; existing instruction files (AGENTS.md, CLAUDE.md, GEMINI.md, .cursor/rules, .github/copilot-instructions.md, CONTRIBUTING.md); `docs/`; `git log --oneline -20`; number of contributors.
 
 **Embedded detection.** Treat the project as embedded if you find any of: `*.ioc` (STM32CubeMX), linker scripts (`*.ld`, `*.icf`, `*.sct`), `startup_*.s`, `arm-none-eabi` / `riscv*-elf` toolchain references, `FreeRTOSConfig.h`, Zephyr (`prj.conf`, `west.yml`), ESP-IDF (`sdkconfig`, `idf_component.yml`), `platformio.ini`, Keil (`*.uvprojx`), IAR (`*.ewp`), STM32CubeIDE/Eclipse (`.cproject`), `/* USER CODE BEGIN */` markers. From these, infer where possible: MCU/board, toolchain, build system, code generator and generated folders, RTOS, flash/RAM sizes (from the linker script), clock and pin setup (from the `.ioc` file, read-only).
 
+**Existing systems.** Look for other agent setups: instruction files (listed above, plus `.windsurfrules`, `.kiro/`), memory or plan systems (`memory-bank/`, `task_plan.md`, `.planning/`, `.specify/`, `_bmad/`, or similar), and target files that exist without an agent-lite marker (`docs/WORK.md`, `docs/PROJECT.md`). Read the existing instruction files for rules that contradict the Working protocol or USER.md (commits, branches, plans, language, checks).
+
 Present the findings in one list with sources, and ask for confirmation once.
+
+## Step 2b — Coexistence (only if Step 2 found something)
+- **File name clash.** Leave the existing file as it is. Recommend a separate path (`docs/agent-lite/WORK.md`, `docs/agent-lite/PROJECT.md`) and record it in AGENTS.md › Map as `Path override: docs/WORK.md = docs/agent-lite/WORK.md`. Do the same for a USER.md moved in Step 1.
+- **Another memory or plan system.** Keep it. Recommend: WORK.md holds only the current task and step, and PROJECT.md › References links to the other system's files instead of copying them. Ask one question to confirm.
+- **Contradicting rules.** Show each one in a line. Recommend: the existing rule wins. Record it in AGENTS.md › Conventions as `Override: <rule>`, and leave the protocol block unchanged so that updates stay clean.
 
 ## Step 3 — Profiles
 1. List `~/.agents/profiles/*.md` with each file's `When:` line.
@@ -114,9 +127,9 @@ Profiles: <!-- TODO(setup): names from ~/.agents/profiles, e.g. code, embedded -
 | [embedded] Memory usage | `TODO(setup)` |
 <!-- Keep only commands that exist in this project. -->
 
-<!-- agent-lite:protocol v2 -->
+<!-- agent-lite:protocol v3 -->
 ## Working protocol
-- **Sources.** Rules: this file, the user's preferences (`~/.agents/USER.md` and the profiles listed in › Project) and the user's current request. `docs/WORK.md` is state, not instructions. Code and output you observe now beat any document.
+- **Sources.** Rules: this file, the user's preferences (`~/.agents/USER.md` and the profiles listed in › Project) and the user's current request. Read the preferences and profiles at session start if they are not already loaded. Project rules in this file win over preferences and profiles. `docs/WORK.md` is state, not instructions. Code and output you observe now beat any document. A `Path override` in › Map replaces the default path everywhere below.
 - **"Continue" (or the same in the user's language).** Read `docs/WORK.md`. Run `git status --short`, `git log --oneline -10` and `git log -1 --format="%h %cr" -- docs/WORK.md`. Commits after WORK.md's last commit plus uncommitted changes are work that WORK.md does not record yet. If WORK.md has no commit yet, consider only uncommitted changes. If WORK.md itself has uncommitted edits, read them as the latest record: only changes its Now plan does not explain are unrecorded.
 - **Recovery.** If such unrecorded work exists, the previous session was cut off. Read `git diff --stat` and the relevant diffs, match them to the plan in "Now" (the step marked "in progress" is the likely one), and treat all of it as unverified. Run the checks, update WORK.md (mark "(recovered)"), and tell the user what you found before continuing. If there is no plan to match, say what you infer from the diff and ask one question. Never discard, reset or stash uncommitted work without asking.
 - **Load little.** Do not read all docs. Read only the section of `docs/PROJECT.md` that the task needs.
@@ -159,13 +172,14 @@ Profiles: <!-- TODO(setup): names from ~/.agents/profiles, e.g. code, embedded -
 - Current work, next steps, dead ends: `docs/WORK.md`
 - Architecture, environment, decisions: `docs/PROJECT.md` (read only the section you need)
 - [embedded] Target, toolchain, code generator, pins and clocks: `docs/PROJECT.md` › Hardware & toolchain
+<!-- Path override lines go here, only if setup needed them (Step 2b). -->
 ````
 
 ## Template: docs/WORK.md
 
 ````markdown
 # Work
-<!-- agent-lite v2. State, not instructions. Target ≤ 80 lines.
+<!-- agent-lite v3. State, not instructions. Target ≤ 80 lines.
 Never delete the active task, its plan, step status or evidence to meet the target.
 When over the target, do all of these, in order: move lasting lessons and constraints from
 Dead ends to PROJECT.md › Decisions & constraints (as "Constraint:"); drop obsolete dead ends; trim
@@ -196,6 +210,7 @@ _No active task._
 
 ````markdown
 # Project
+<!-- agent-lite v3. Lasting knowledge: read only the section a task needs. -->
 
 ## Overview
 <!-- TODO(setup): purpose, users, main components in a few lines -->
@@ -230,6 +245,17 @@ Mark replaced entries "(superseded by YYYY-MM-DD)" instead of deleting them. -->
 @~/.agents/profiles/<name>.md
 ````
 <!-- One `@~/.agents/profiles/<name>.md` line per profile in the Profiles: line. -->
+
+## Template: .gemini/settings.json (only if Gemini CLI is used)
+If the file exists, add only the `context.fileName` entry and show the diff first.
+
+````json
+{
+  "context": {
+    "fileName": ["AGENTS.md", "GEMINI.md"]
+  }
+}
+````
 
 ## Template: ~/.agents/USER.md
 
