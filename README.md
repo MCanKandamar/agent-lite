@@ -1,6 +1,6 @@
 # agent-lite
 
-A small, tool-independent working system for AI coding agents (Claude Code, Codex, Gemini CLI and others).
+A small, tool-independent working system for AI coding agents (Claude Code, Codex, Antigravity, Gemini CLI, Cursor and others).
 
 - Start a new session, say "continue the project", and the agent picks up where the last one stopped.
 - If an agent is cut off mid-task (quota, crash), the next one finds the unfinished work through git and recovers it.
@@ -23,8 +23,8 @@ No server, no dependencies: only Markdown files and one skill.
 ```
 
 - **Core vs. profiles.** USER.md holds only what is true everywhere. Coding rules don't leak into your CV, and document rules don't leak into your firmware.
-- **Picking profiles.** A project names its profiles in AGENTS.md (`Profiles: code, embedded, learning`). Claude Code also gets them as `@` imports in CLAUDE.md (it asks once per project to allow imports from outside the repository); other agents read the files at session start. Without a project (e.g. a quick session to edit a document), the agent picks one from the index in USER.md, or asks.
-- **New kinds of work.** If no profile fits, setup asks up to five questions and drafts a new profile. After that, when you correct the agent on something that applies to all work of that kind, it proposes adding the rule to the profile.
+- **Picking profiles.** A project names its profiles in AGENTS.md (`Profiles: code, embedded, learning`). Claude Code also gets them as `@` imports in CLAUDE.md; other agents read the files at session start.
+- **New kinds of work.** If no profile fits, setup asks up to five questions and drafts a new profile.
 - **Recovery.** On "continue", the agent compares git history with WORK.md. Commits or uncommitted changes that WORK.md does not record mean the last session was interrupted. The agent matches them to the plan, marks them unverified, re-runs the checks and tells you.
 
 ## Profiles included
@@ -40,8 +40,19 @@ Edit them freely; they are your rules.
 
 ## Install
 
-Windows PowerShell, from the cloned repository folder:
+### Option 1: Via [skills.sh](https://www.skills.sh/) (Fast Skill Install)
 
+Install the `project-setup` skill directly using `npx skills`:
+
+```bash
+npx skills add mcankandamar/agent-lite --skill project-setup -g
+```
+
+### Option 2: Clone & Local Setup (Includes Bundled Profiles)
+
+To install both the setup skill and the initial profiles (`code`, `embedded`, `learning`, `docs`):
+
+**Windows (PowerShell):**
 ```powershell
 New-Item -ItemType Directory -Force "$HOME\.agents\skills", "$HOME\.agents\profiles", "$HOME\.claude\skills" | Out-Null
 Copy-Item -Recurse -Force ".\skills\project-setup" "$HOME\.agents\skills"
@@ -49,34 +60,48 @@ Copy-Item -Recurse -Force ".\skills\project-setup" "$HOME\.claude\skills"
 Get-ChildItem ".\profiles\*.md" | ForEach-Object { if (-not (Test-Path "$HOME\.agents\profiles\$($_.Name)")) { Copy-Item $_.FullName "$HOME\.agents\profiles\" } }
 ```
 
-macOS / Linux:
-
+**macOS / Linux:**
 ```bash
 mkdir -p ~/.agents/skills ~/.agents/profiles ~/.claude/skills
 cp -R skills/project-setup ~/.agents/skills/ && cp -R skills/project-setup ~/.claude/skills/
 cp -n profiles/*.md ~/.agents/profiles/
 ```
 
-Existing profiles are never overwritten. Claude Code reads skills from `~/.claude/skills`, Codex from `~/.agents/skills`.
+Existing profiles are never overwritten. Claude Code reads skills from `~/.claude/skills`, Codex and Antigravity read from `~/.agents/skills`.
 
 ## Use
 
-- **Set up a project:** open the repository in your agent and run the skill: `/project-setup` in Claude Code, `$project-setup` in Codex, or say "set up agent-lite in this project". Without skill support, paste `skills/project-setup/setup-prompt.md` into the chat. The first run also creates `~/.agents/USER.md` and links it for your agents.
-- **Daily:** "continue the project". For bigger tasks the agent writes the goal and plan to `docs/WORK.md` first.
-- **Preferences:** "update my preferences".
-- **Profiles:** "create a profile for <kind of work>" or "add this rule to the <name> profile".
+- **Set up a project:** Open the repository in your AI agent and run the skill:
+  - **Claude Code:** `/project-setup`
+  - **Codex:** `$project-setup`
+  - **Antigravity:** `/project-setup`
+  - **Or prompt:** `"set up agent-lite in this project"` (if your agent is smart enough, it will set it up itself).
+  - **Without skill support:** Paste `skills/project-setup/setup-prompt.md` into the chat.
+- **Daily workflow:** Say `"continue the project"`. For bigger tasks, the agent writes the goal and plan to `docs/WORK.md` first.
+- **Preferences:** `"update my preferences"`.
+- **Profiles:** `"create a profile for <kind of work>"` or `"add this rule to the <name> profile"`.
+
+### Quick Demo
+
+```text
+User: continue the project
+
+Agent:
+Read docs/WORK.md. Found unrecorded commit 5f82a1c from previous session (interrupted).
+- Recovered: STM32 SPI peripheral setup (verified: `cmake --build build` ✓)
+- Current task in plan: DMA interrupt handler (in progress)
+- Memory usage: built ✓ (flash 41.2/64 KB, RAM 9.8/20 KB)
+
+Next step: Implement DMA buffer allocation. Ready to proceed?
+```
 
 ## Update
 
-Pull the repository, run the install commands again, then say "update agent-lite" in each project. This replaces only the protocol block in AGENTS.md (between `<!-- agent-lite:protocol … -->` markers) and shows the diff first. Your profiles and USER.md are left alone.
+Pull the repository, run the install commands again, then say `"update agent-lite"` in each project. This replaces only the protocol block in AGENTS.md (between `<!-- agent-lite:protocol … -->` markers) and shows the diff first.
 
 ## Uninstall
 
-Delete `AGENTS.md`, `docs/WORK.md` and `docs/PROJECT.md` from a project, and the `project-setup` folders from `~/.agents/skills` and `~/.claude/skills`. `~/.agents/USER.md` and `~/.agents/profiles` are yours to keep or delete.
-
-## Status
-
-Developed and used with Claude Code and Codex on Windows. Gemini CLI, Cursor and Copilot are supported by the setup steps but not tested.
+Delete `docs/WORK.md`, `docs/PROJECT.md`, and `AGENTS.md` (or remove only the agent-lite sections if you already had an existing `AGENTS.md`). Remove the `project-setup` folders from `~/.agents/skills` and `~/.claude/skills`. `~/.agents/USER.md` and `~/.agents/profiles` are yours to keep or delete.
 
 ## License
 
