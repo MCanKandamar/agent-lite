@@ -121,6 +121,12 @@ cp -R agent-lite/skills/agent-lite ~/.claude/skills/
 - **Preferences:** "update my preferences". This also sets how closely you follow the work: report each step, or stop after each step.
 - **Profiles:** "create a profile for <kind of work>" or "add this rule to the <name> profile".
 
+## Read-only files
+
+Some files should never change: libraries, generated code, approved drawings. During setup, the agent looks for them and suggests a list, with a reason for each one. You decide what goes on it. Files on the list are read-only: the agent can read them, but if a task needs a change there, it stops and asks you. Everything else stays read/write.
+
+To add one later, say "make `vendor/` read-only". This is a rule the agent follows, not a file lock. For a hard block, also use your agent's own permission settings.
+
 ## Profiles
 
 A profile holds the rules for one kind of work. A project lists its profiles in `AGENTS.md`, for example `Profiles: code, embedded`. These four are included, and you can edit them freely:
@@ -147,7 +153,7 @@ For any other kind of work, setup asks up to five questions and drafts a profile
 
 - When a task is finished, start a new session instead of carrying on. `docs/WORK.md` holds what the next one needs.
 - If the task is not finished and the context is large, compact it and say what to keep: the goal, decisions, failed attempts and the next step.
-- In Claude Code, a `UserPromptSubmit` hook can read the token count from the session transcript and remind you at 200K and every 100K after that. This is optional and needs a script, so it is not part of agent-lite.
+- In Claude Code and Codex, [context-guard](https://github.com/MCanKandamar/context-guard) reminds you at 200K tokens and every 100K after that. It is optional and needs Python, so it is not part of agent-lite.
 
 ## Update
 

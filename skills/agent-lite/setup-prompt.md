@@ -10,7 +10,7 @@ A file belongs to agent-lite only if it carries a marker: `<!-- agent-lite` in i
 
 ## Modes
 Decide the mode yourself, then tell the user in one line. Check in this order; the first match wins:
-- **update**: agent-lite files exist and the user asked to update → replace only the text between `<!-- agent-lite:protocol v… -->` and `<!-- /agent-lite:protocol -->` in AGENTS.md with the current template: show the diff, apply it after approval, and stop. If AGENTS.md has a `Learning mode: on` line (v1), offer to replace it with `learning` in the `Profiles:` line.
+- **update**: agent-lite files exist and the user asked to update → replace only the text between `<!-- agent-lite:protocol v… -->` and `<!-- /agent-lite:protocol -->` in AGENTS.md with the current template: show the diff, apply it after approval, and stop. If AGENTS.md has a `Learning mode: on` line (v1), offer to replace it with `learning` in the `Profiles:` line. If AGENTS.md has no `## File access` section, offer to add it: find read-only candidates as in Step 2, show them, and let the user decide.
 - **preferences**: the user asked to change their preferences → run Steps 0 and 1 only.
 - **profile**: the user asked to create or change a profile → run Steps 0 and 3 only (no repository needed).
 - **resume**: `TODO(setup)` markers exist in agent-lite's AGENTS.md, WORK.md or PROJECT.md → continue from the first unanswered item; never re-ask answered items.
@@ -56,7 +56,9 @@ Read only what is needed: README; manifests and build files (package.json, pypro
 
 **Existing systems.** Look for other agent setups: instruction files (listed above, plus `.windsurfrules`, `.kiro/`), memory or plan systems (`memory-bank/`, `task_plan.md`, `.planning/`, `.specify/`, `_bmad/`, or similar), and target files that exist without an agent-lite marker (`docs/WORK.md`, `docs/PROJECT.md`). Read the existing instruction files for rules that contradict the Working protocol or USER.md (commits, branches, plans, language, checks).
 
-Present the findings in one list with sources, and ask for confirmation once.
+**Read-only candidates.** Look for files the agent should read but not change: third-party code (`vendor/`, `third_party/`, `external/`, `libs/`, submodules in `.gitmodules`, `Drivers/` and `Middlewares/` in STM32 projects), generated files (headers such as `DO NOT EDIT` or `@generated`), and reference material (datasheets, customer documents, approved drawings). Skip what git already ignores, such as `node_modules/` or build output. Keep the candidates for Step 4, question 2b.
+
+Present the other findings in one list with sources, and ask for confirmation once.
 
 ## Step 2b — Coexistence (only if Step 2 found something)
 - **File name clash.** Leave the existing file as it is. Recommend a separate path (`docs/agent-lite/WORK.md`, `docs/agent-lite/PROJECT.md`) and record it in AGENTS.md › Map as `Path override: docs/WORK.md = docs/agent-lite/WORK.md`. Do the same for a USER.md moved in Step 1.
@@ -78,6 +80,7 @@ Present the findings in one list with sources, and ask for confirmation once.
 ## Step 4 — Questions (ask only what is still unknown, in this order)
 1. Purpose: what the project is, who uses it, its stage (prototype / active / production / maintenance). → AGENTS.md › Project
 2. Working principles: show the default "Always ask first" list and ask what to add for this project (e.g. migrations, payment code, public API, safety-critical code). → AGENTS.md › Always ask first
+   2b. Read-only files: show the candidates from Step 2, each with its reason, as "I recommend not touching these". The user decides: accept them (recommended), remove some, or add others. → AGENTS.md › File access
 3. Architecture: preferred structure, constraints, things to avoid. → PROJECT.md › Architecture
 4. Project-specific conventions that neither the tools nor the chosen profiles cover (naming, error handling, MISRA or similar rules, allowed language features). → AGENTS.md › Conventions
 5. Development environment: confirm detected build/test/lint commands; ask for missing ones and for anything needed to run the project that is not in the repo (services, environment variable names, tools). → AGENTS.md › Commands, PROJECT.md › Environment
@@ -135,6 +138,7 @@ Profiles: <!-- TODO(setup): names from ~/.agents/profiles, e.g. code, embedded -
 - **"Continue" (or the same in the user's language).** Read `docs/WORK.md`. Run `git status --short`, `git log --oneline -10` and `git log -1 --format="%h %cr" -- docs/WORK.md`. Commits after WORK.md's last commit plus uncommitted changes are work that WORK.md does not record yet. If WORK.md has no commit yet, consider only uncommitted changes. If WORK.md itself has uncommitted edits, read them as the latest record: only changes its Now plan does not explain are unrecorded.
 - **Recovery.** If such unrecorded work exists, the previous session was cut off. Read `git diff --stat`, `git show --stat` for each unrecorded commit, and the relevant diffs, match them to the plan in "Now" (the step marked "in progress" is the likely one), and treat all of it as unverified. Run the checks, update WORK.md (mark "(recovered)"), and tell the user what you found before continuing. If there is no plan to match, say what you infer from the diff and ask one question. Never discard, reset or stash uncommitted work without asking.
 - **Load little.** Do not read all docs. Read only the section of `docs/PROJECT.md` that the task needs.
+- **File access.** Paths listed in › File access are read-only: read them, but never create, change, move or delete anything there, even if a task seems to need it. If it does, stop and tell the user what you would change and why; only the user can lift the rule. An allowed build or generator may still rewrite its own output. When the user calls a path read-only, add it to › File access.
 - **Significant task** (more than a quick fix): before editing, write the goal and a short plan to WORK.md › Now. When you start a step, mark it "(in progress)".
 - **Step done.** Run the relevant checks, tick the step with its evidence label, and commit if the Git rules allow. Then write the step report: the commit (or "uncommitted"), files changed, why, and how the user can check it. USER.md › Review says when to report and when to stop for the user's OK; without that section, report and continue. Quick fixes need no WORK.md update and no report.
 - **Dead ends.** When you abandon an approach, add it to WORK.md › Dead ends with the reason. Check Dead ends before proposing an approach.
@@ -162,6 +166,12 @@ Profiles: <!-- TODO(setup): names from ~/.agents/profiles, e.g. code, embedded -
 - [embedded] option bytes, fuses, read-out protection, bootloader changes (may be irreversible)
 - [embedded] changing pin, clock or peripheral configuration (.ioc, clock tree, pinmux, device tree, linker-script memory regions)
 <!-- TODO(setup): project-specific additions (question 2) -->
+
+## File access
+Everything is read/write except the paths below.
+
+Read-only:
+<!-- TODO(setup): `path/` — why (question 2b); write "none" if there are none -->
 
 ## Conventions
 <!-- TODO(setup): only rules that tools and profiles do not cover (questions 4 and 6) -->
