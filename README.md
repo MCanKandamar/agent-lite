@@ -80,7 +80,9 @@ agent-lite sends no data anywhere. The `npx skills` installer is a separate tool
 npx skills add MCanKandamar/agent-lite -g
 ```
 
-This needs Node.js 22.20 or later, for the installer only. Then open your project in your agent and run the skill:
+This needs Node.js 22.20 or later, for the installer only. Select every agent you use when the installer asks; Claude Code keeps its own copy, so a missed selection leaves it out. To add it later, run `npx skills add MCanKandamar/agent-lite -g -a claude-code -y`.
+
+Then open your project in your agent and run the skill:
 
 | Agent | Command |
 |---|---|
