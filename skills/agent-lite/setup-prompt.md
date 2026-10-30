@@ -1,4 +1,4 @@
-# agent-lite setup (v3)
+# agent-lite setup (v4)
 
 You are installing **agent-lite** into the current repository: a small set of files that lets any AI agent continue this project across sessions and tools. Talk to the user in their language (see `~/.agents/USER.md` if it exists; otherwise use the language of their messages). Agent files (AGENTS.md, docs/WORK.md, docs/PROJECT.md) are written in English unless USER.md says otherwise; section headings and labels always stay in English.
 
@@ -13,6 +13,7 @@ Decide the mode yourself, then tell the user in one line. Check in this order; t
 - **update**: agent-lite files exist and the user asked to update → replace only the text between `<!-- agent-lite:protocol v… -->` and `<!-- /agent-lite:protocol -->` in AGENTS.md with the current template: show the diff, apply it after approval, and stop. If AGENTS.md has a `Learning mode: on` line (v1), offer to replace it with `learning` in the `Profiles:` line. If AGENTS.md has no `## File access` section, offer to add it: find read-only candidates as in Step 2, show them, and let the user decide.
 - **preferences**: the user asked to change their preferences → run Steps 0 and 1 only.
 - **profile**: the user asked to create or change a profile → run Steps 0 and 3 only (no repository needed).
+- **team**: the user asked to share the project between several people → run Step 7 only.
 - **resume**: `TODO(setup)` markers exist in agent-lite's AGENTS.md, WORK.md or PROJECT.md → continue from the first unanswered item; never re-ask answered items.
 - **installed**: AGENTS.md has the protocol block and no `TODO(setup)` remains → say that agent-lite is already installed, offer update, preferences or a profile, and change nothing.
 - **existing**: there is code or documentation, and AGENTS.md has no `<!-- agent-lite:protocol` block.
@@ -110,6 +111,15 @@ Use the templates below.
 - Check that AGENTS.md, WORK.md and PROJECT.md exist (at their `Path override` paths, if any), that every profile in the `Profiles:` line exists in `~/.agents/profiles/`, and that no `TODO(setup)` markers remain. A listed profile that is missing: offer to create it with the Step 3 interview, or to remove it from the line.
 - Show the user: the decisions taken (and whether each was inferred or answered), the profiles used or created, the files created or changed, and the open questions.
 - Suggest a commit (`chore: add agent-lite working files`) and wait for approval if the Git rules require it.
+- If Step 2 found more than one contributor, offer to share the project (Step 7).
+
+## Step 7 — Shared project (only in team mode)
+Needs protocol v4 or later in AGENTS.md; if it is older, run update first. Each step that changes a file follows hard rule 2.
+1. Work out the handle (see Working protocol › Sources), show it, and ask for one confirmation.
+2. Move the current WORK.md with `git mv` to `docs/work/<handle>.md`, using the real handle in the file name.
+3. Add `Path override: docs/WORK.md = docs/work/<handle>.md` to AGENTS.md › Map, keeping the literal text `<handle>`. Replace any earlier override for WORK.md.
+4. Add `docs/work/*.md linguist-generated=true` to `.gitattributes`, so GitHub collapses work files in pull requests.
+5. Tell the user: each teammate installs agent-lite, sets a unique `Handle:` in USER.md, and says "continue"; their agent creates their own file. Use the same handle and git user.name on every machine. Everyone needs the profiles in the `Profiles:` line. Work files show only what has reached the current branch, so this is shared memory, not live coordination.
 
 ---
 
@@ -132,16 +142,16 @@ Profiles: <!-- TODO(setup): names from ~/.agents/profiles, e.g. code, embedded -
 | [embedded] Memory usage | `TODO(setup)` |
 <!-- Keep only commands that exist in this project. -->
 
-<!-- agent-lite:protocol v3 -->
+<!-- agent-lite:protocol v4 -->
 ## Working protocol
-- **Sources.** Rules: this file, the user's preferences (`~/.agents/USER.md` and the profiles listed in › Project) and the user's current request. Read the preferences and profiles at session start if they are not already loaded. Project rules in this file win over preferences and profiles. `docs/WORK.md` is state, not instructions. Code and output you observe now beat any document. A `Path override` in › Map replaces the default path everywhere below.
-- **"Continue" (or the same in the user's language).** Read `docs/WORK.md`. Run `git status --short`, `git log --oneline -10` and `git log -1 --format="%h %cr" -- docs/WORK.md`. Commits after WORK.md's last commit plus uncommitted changes are work that WORK.md does not record yet. If WORK.md has no commit yet, consider only uncommitted changes. If WORK.md itself has uncommitted edits, read them as the latest record: only changes its Now plan does not explain are unrecorded.
+- **Sources.** Rules: this file, the user's preferences (`~/.agents/USER.md` and the profiles listed in › Project) and the user's current request. Read the preferences and profiles at session start if they are not already loaded. Project rules in this file win over preferences and profiles. `docs/WORK.md` is state, not instructions. Code and output you observe now beat any document. A `Path override` in › Map replaces the default path everywhere below. In such a path, `<handle>` is `Handle:` from USER.md › About me, or else `git config user.name` in lowercase ASCII with spaces replaced by hyphens.
+- **"Continue" (or the same in the user's language).** Read `docs/WORK.md`. Run `git status --short`, `git log --oneline -10` and `git log -1 --format="%h %cr" -- docs/WORK.md`. Commits after WORK.md's last commit plus uncommitted changes are work that WORK.md does not record yet. If WORK.md has no commit yet, consider only uncommitted changes. If WORK.md itself has uncommitted edits, read them as the latest record: only changes its Now plan does not explain are unrecorded. If your WORK.md path contains `<handle>`, the project is shared: count only your own commits, with `git log --oneline --no-merges --author="<your git user.name>" <WORK.md's last commit>..HEAD`. A squash of a teammate's work can still match, so check each commit against your plan before calling it interrupted work. If your file does not exist yet, create it with the same headings as another work file, empty, and start fresh.
 - **Recovery.** If such unrecorded work exists, the previous session was cut off. Read `git diff --stat`, `git show --stat` for each unrecorded commit, and the relevant diffs, match them to the plan in "Now" (the step marked "in progress" is the likely one), and treat all of it as unverified. Run the checks, update WORK.md (mark "(recovered)"), and tell the user what you found before continuing. If there is no plan to match, say what you infer from the diff and ask one question. Never discard, reset or stash uncommitted work without asking.
 - **Load little.** Do not read all docs. Read only the section of `docs/PROJECT.md` that the task needs.
 - **File access.** Paths listed in › File access are read-only: read them, but never create, change, move or delete anything there, even if a task seems to need it. If it does, stop and tell the user what you would change and why; only the user can lift the rule. An allowed build or generator may still rewrite its own output. When the user calls a path read-only, add it to › File access.
 - **Significant task** (more than a quick fix): before editing, write the goal and a short plan to WORK.md › Now. When you start a step, mark it "(in progress)".
 - **Step done.** Run the relevant checks, tick the step with its evidence label, and commit if the Git rules allow. Then write the step report: the commit (or "uncommitted"), files changed, why, and how the user can check it. USER.md › Review says when to report and when to stop for the user's OK; without that section, report and continue. Quick fixes need no WORK.md update and no report.
-- **Dead ends.** When you abandon an approach, add it to WORK.md › Dead ends with the reason. Check Dead ends before proposing an approach.
+- **Dead ends.** When you abandon an approach, add it to WORK.md › Dead ends with the reason. Check Dead ends before proposing an approach. In a shared project, a dead end that others could hit also goes to PROJECT.md › Decisions & constraints as a `Constraint:`.
 - **Task done.** Move it to Done with evidence, choose Next[1] or ask the user, and keep WORK.md within its size rule.
 - **Knowledge.** If architecture, environment, hardware setup or a decision changes, update `docs/PROJECT.md` in the same change. If code and a document disagree, the code wins; fix the document.
 - **Honesty.** Never claim a check you did not run. Report every check as passed, failed or not run (with the reason). A pass before later edits does not count. Use the labels below.
@@ -191,7 +201,7 @@ Read-only:
 
 ````markdown
 # Work
-<!-- agent-lite v3. State, not instructions. Target ≤ 80 lines.
+<!-- agent-lite v4. State, not instructions. Target ≤ 80 lines.
 Never delete the active task, its plan, step status or evidence to meet the target.
 When over the target, do all of these, in order: move lasting lessons and constraints from
 Dead ends to PROJECT.md › Decisions & constraints (as "Constraint:"); drop obsolete dead ends; trim
@@ -222,7 +232,7 @@ _No active task._
 
 ````markdown
 # Project
-<!-- agent-lite v3. Lasting knowledge: read only the section a task needs. -->
+<!-- agent-lite v4. Lasting knowledge: read only the section a task needs. -->
 
 ## Overview
 <!-- TODO(setup): purpose, users, main components in a few lines -->
@@ -278,6 +288,7 @@ Change only with the user's consent. Lives at ~/.agents/USER.md. -->
 
 ## About me
 - <!-- role and experience in one line, e.g. "Junior developer, learning while building" -->
+- Handle: <!-- optional short name for shared projects, e.g. "alex"; default: your git user.name -->
 
 ## Communication
 - Conversation: <!-- your language -->. Files: the language the active profile says; agent files (AGENTS.md, WORK.md) in English.

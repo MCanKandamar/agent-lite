@@ -4,6 +4,7 @@ Change only with the user's consent. Lives at ~/.agents/USER.md. -->
 
 ## About me
 - <!-- role and experience in one line, e.g. "Junior developer, learning while building" -->
+- Handle: <!-- optional short name for shared projects, e.g. "alex"; default: your git user.name -->
 
 ## Communication
 - Conversation: <!-- your language -->. Files: the language the active profile says; agent files (AGENTS.md, WORK.md) in English.
