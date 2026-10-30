@@ -140,6 +140,17 @@ A profile holds the rules for one kind of work. A project lists its profiles in 
 
 For any other kind of work, setup asks up to five questions and drafts a profile. One mechanical engineer already uses agent-lite to have an agent produce drawings.
 
+## Working in a team
+
+Say "share this project between several people". Each person then gets their own work file, `docs/work/<name>.md`, so state stays separate. Each person sets a unique `Handle:` in `USER.md`; without one, the name comes from their git user name.
+
+- Recovery looks only at your own commits, so a teammate's work is not mistaken for your interrupted session.
+- Dead ends that could affect others also go to `docs/PROJECT.md`, which everyone shares.
+- GitHub collapses work files in pull requests.
+- Preferences stay personal, in each person's `USER.md`.
+
+This gives each person their own memory; it is not live coordination. A teammate's work file shows only what has reached your branch.
+
 ## Works with
 
 | Agent | Status |
