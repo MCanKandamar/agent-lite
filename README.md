@@ -6,11 +6,11 @@ agent-lite is a small working system for AI agents, made of Markdown files and g
 
 - **Continue anywhere.** Start a new session, or move from Claude Code to Codex when your quota runs out. Say "continue the project" and the work carries on.
 - **Recover interrupted work.** If a session stops mid-task, the next one compares git with the notes, finds what was never recorded and checks it again.
-- **Follow every step.** Work is planned first and done in small commits, each with a reason and a check you can repeat.
+- **Follow the work.** Bigger tasks are planned first and done in small steps, each with a reason and a check you can repeat.
 - **Spend less on long sessions.** The state lives in files, so a fresh session can replace a huge one.
 - **Use it beyond code.** It works for any repeatable work that fits in a folder: software, firmware, drawings, reports.
 
-No server, no scripts, no hooks. It runs nothing: your agent reads the files and follows them.
+No server, no scripts, no hooks: your agent reads the files and follows them.
 
 ## See it work
 
@@ -27,7 +27,7 @@ Agent: Read docs/WORK.md. Commit 5f82a1c is not recorded there, so the last sess
        Next step: Reset form. Shall I continue?
 ```
 
-After each step you get a short report:
+By default, each step of a planned task ends with a short report:
 
 ```text
 Commit: 8c41e2d
@@ -40,26 +40,39 @@ Check:  run `npm test`, then request a reset and open the link after 15 minutes
 
 **Agents lose context.** A session ends, a quota runs out or a tool crashes, and what the agent knew goes with it. Keeping one session open gets expensive instead: every request sends the whole context again. In the author's Claude Code setup, a new session starts near 76K tokens, so a 300K session carries about four times as much on every request. agent-lite itself adds roughly 2K tokens, plus your project notes.
 
-**People lose track of the code.** This is often called [comprehension debt](https://addyosmani.com/blog/comprehension-debt/): the gap between how much code exists and how much of it anyone understands. In a [randomized trial](https://www.anthropic.com/research/AI-assistance-coding-skills), 52 engineers learned a new library. The group using AI scored 50% on a quiz and the group coding by hand scored 67%. The trial did not test agent-lite, but it shows the problem: small commits with a stated reason give you something you can actually read.
+**People lose track of the code.** This is often called [comprehension debt](https://addyosmani.com/blog/comprehension-debt/): the gap between how much code exists and how much of it anyone understands. In one [randomized trial](https://www.anthropic.com/research/AI-assistance-coding-skills) of 52 engineers, the group using AI scored 50% on a quiz about a new library, and the group coding by hand scored 67%. Small steps with a stated reason give you something you can actually read.
 
 ## How memory works
 
 | Layer | Where | What it holds | When the agent reads it |
 |---|---|---|---|
-| Short-term | `docs/WORK.md` | Current task, plan, dead ends (80 lines at most) | Every "continue" |
+| Short-term | `docs/WORK.md` | Current task, plan, dead ends (target: 80 lines) | Every "continue" |
 | Long-term | `docs/PROJECT.md` | Architecture, environment, decisions | Only the section a task needs |
-| Archive | git history | Every commit and every old WORK.md | During recovery, or when needed |
-| Rules | `~/.agents/USER.md`, profiles | Your preferences, for every project | At the start of each session |
+| Archive | git history | Commits and earlier versions of WORK.md | During recovery, or when needed |
+| Rules | `~/.agents/USER.md`, profiles | Your preferences, and the profiles a project lists | At the start of each session |
 
-Each project also gets an `AGENTS.md` with its commands and the working protocol. Claude Code gets a one-line `CLAUDE.md` that imports it.
+Each project also gets an `AGENTS.md` with its commands and the working protocol. Claude Code gets a small `CLAUDE.md` that imports it and your profiles.
 
 ## What makes it different
 
-- **Git is the witness.** Notes can be out of date; git cannot. The agent treats anything the notes do not record as unverified until it checks it.
-- **It belongs to no tool.** There is nothing to run, so any agent that reads files and uses git can follow it, and it can take over from another.
+- **Git is the witness.** Notes can be out of date; git shows what really changed. The agent treats anything the notes do not record as unverified until it checks it.
+- **It belongs to no tool.** Any agent that reads files and uses git can follow it, and one agent can take over from another.
 - **Evidence instead of claims.** A check counts only if it ran after the last edit: `verified: npm test ✓`, `failed`, or `not run` with the reason.
 - **Your rules follow you.** Write your preferences once. Profiles keep coding rules out of your CV and document rules out of your code.
 - **It is small enough to read.** You can check every file before you install it.
+
+## Safe with what you already have
+
+Setup only adds. If you already use `AGENTS.md`, `CLAUDE.md`, Cursor rules, Memory Bank, planning-with-files, Spec Kit or something similar, it stays in place.
+
+- It shows a diff and waits for your approval before it changes any existing file, inside or outside the project.
+- It looks for other agent systems and lists what it finds. It never migrates or disables them.
+- If `docs/WORK.md` or `docs/PROJECT.md` is already taken, it uses `docs/agent-lite/` instead.
+- If your rules contradict the protocol, your existing rule wins and is recorded as an override.
+- It never changes source code, build files or CI, and it never asks for secrets.
+- Running it twice is safe: the second run says it is already installed.
+
+agent-lite sends no data anywhere. The `npx skills` installer is a separate tool that sends anonymous install counts; set `DISABLE_TELEMETRY=1` to turn that off.
 
 ## Install
 
@@ -75,7 +88,9 @@ This needs Node.js 22.20 or later, for the installer only. Then open your projec
 | Codex | `$agent-lite` |
 | Any other | say "set up agent-lite in this project" |
 
-Setup asks one question at a time and skips what it can read from the repository.
+If your agent has no skill support, paste `skills/agent-lite/setup-prompt.md` into the chat.
+
+Setup asks one question at a time and skips what it can read from the repository. It keeps your preferences in `~/.agents/USER.md` and the included profiles in `~/.agents/profiles`.
 
 <details>
 <summary>Install without Node.js</summary>
@@ -98,23 +113,7 @@ cp -R agent-lite/skills/agent-lite ~/.agents/skills/
 cp -R agent-lite/skills/agent-lite ~/.claude/skills/
 ```
 
-If your agent has no skill support, paste `skills/agent-lite/setup-prompt.md` into the chat.
-
 </details>
-
-## Safe with what you already have
-
-Setup only adds. If you already use `AGENTS.md`, `CLAUDE.md`, Cursor rules, Memory Bank, planning-with-files, Spec Kit or something similar, it stays in place.
-
-- It shows a diff and waits for your approval before it changes any existing file.
-- It looks for other agent systems and lists what it finds. It never migrates or disables them.
-- If a file name is taken, it uses a separate path, such as `docs/agent-lite/WORK.md`.
-- If your rules contradict the protocol, your existing rule wins and is recorded as an override.
-- It never changes source code, build files or CI, and it never asks for secrets.
-- Files outside the project, such as `~/.claude/CLAUDE.md`, change only with your approval.
-- Running it twice is safe.
-
-agent-lite sends no data anywhere. The `npx skills` installer is a separate tool that sends anonymous install counts; set `DISABLE_TELEMETRY=1` to turn that off.
 
 ## Use
 
@@ -133,7 +132,7 @@ A profile holds the rules for one kind of work. A project lists its profiles in 
 | `learning` | You do the work to learn; the agent teaches step by step and leaves your code alone |
 | `docs` | CVs, letters, reports, presentations: never invent facts, keep the document's language |
 
-For any other kind of work, setup asks up to five questions and drafts a profile. A mechanical engineer already uses agent-lite to have an agent produce drawings.
+For any other kind of work, setup asks up to five questions and drafts a profile. One mechanical engineer already uses agent-lite to have an agent produce drawings.
 
 ## Works with
 
@@ -156,7 +155,7 @@ Run the install command again, then say "update agent-lite" in each project. Thi
 
 ## Uninstall
 
-Delete `docs/WORK.md` and `docs/PROJECT.md`. Delete `AGENTS.md` too, or remove only the agent-lite sections if you had that file before. Then remove the `agent-lite` folders from `~/.agents/skills` and `~/.claude/skills`. `~/.agents/USER.md` and `~/.agents/profiles` are yours to keep or delete.
+Delete the agent-lite `WORK.md` and `PROJECT.md`: they are in `docs/`, unless `AGENTS.md` › Map lists a `Path override`. Delete `AGENTS.md` too, or remove only the agent-lite sections if you had that file before. Then remove the `agent-lite` folders from `~/.agents/skills` and `~/.claude/skills`. `~/.agents/USER.md` and `~/.agents/profiles` are yours to keep or delete.
 
 ## License
 

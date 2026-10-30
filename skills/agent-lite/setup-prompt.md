@@ -9,25 +9,26 @@ Preferences come in two layers, both outside the repository:
 A file belongs to agent-lite only if it carries a marker: `<!-- agent-lite` in its text, the title `# User preferences (agent-lite)`, or, for docs/WORK.md and docs/PROJECT.md, a protocol block in the repo's AGENTS.md. Any other file belongs to the user or to another system.
 
 ## Modes
-Decide the mode yourself, then tell the user in one line:
-- **new**: the repo has little or no source code.
-- **existing**: there is code or documentation, and AGENTS.md has no `<!-- agent-lite:protocol` block.
-- **resume**: `TODO(setup)` markers exist in AGENTS.md, docs/WORK.md or docs/PROJECT.md → continue from the first unanswered item; never re-ask answered items.
+Decide the mode yourself, then tell the user in one line. Check in this order; the first match wins:
 - **update**: agent-lite files exist and the user asked to update → replace only the text between `<!-- agent-lite:protocol v… -->` and `<!-- /agent-lite:protocol -->` in AGENTS.md with the current template: show the diff, apply it after approval, and stop. If AGENTS.md has a `Learning mode: on` line (v1), offer to replace it with `learning` in the `Profiles:` line.
 - **preferences**: the user asked to change their preferences → run Steps 0 and 1 only.
 - **profile**: the user asked to create or change a profile → run Steps 0 and 3 only (no repository needed).
+- **resume**: `TODO(setup)` markers exist in agent-lite's AGENTS.md, WORK.md or PROJECT.md → continue from the first unanswered item; never re-ask answered items.
+- **installed**: AGENTS.md has the protocol block and no `TODO(setup)` remains → say that agent-lite is already installed, offer update, preferences or a profile, and change nothing.
+- **existing**: there is code or documentation, and AGENTS.md has no `<!-- agent-lite:protocol` block.
+- **new**: the repo has little or no source code.
 
 ## Hard rules
 1. Never modify source code, build files, CI, dependency manifests or generator project files (e.g. `.ioc`) during setup.
 2. Never rewrite existing content in AGENTS.md, CLAUDE.md, USER.md, profiles or other instruction files. Add sections; show a diff before changing any existing file and wait for approval.
-3. Ask one question per message. Put your recommended option first, marked "(recommended)". Accept "you decide" (= recommended) and "skip" (= recorded as an open question). Never ask for secrets; ask only where credentials come from.
+3. Ask one question per message. Put your recommended option first, marked "(recommended)". Accept "you decide" (= recommended) and "skip" (= recorded as an open question); neither counts as approval of a diff. Never ask for secrets; ask only where credentials come from.
 4. Never ask what you can read from the repo. Show what you inferred, with its source (file or command), and ask for one confirmation.
-5. Before the first project question, create any missing agent-lite files from the templates. Write each answer into its target file right after it is given, so an interrupted setup can resume from the remaining `TODO(setup)` markers.
+5. Right after Step 2b, create or extend the agent-lite files as Step 5 says (its Finishing bullet runs last). Write each answer into its target file right after it is given, so an interrupted setup can resume from the remaining `TODO(setup)` markers.
 6. If the folder is not a git repository, recommend `git init` and ask. Crash recovery depends on git. If the work is mostly binary files (CAD, images, Office files), tell the user that git shows which files changed but not what changed inside them, so WORK.md step status matters more.
 7. Profiles and USER.md hold general rules only. Project facts (commands, paths, hardware) go into AGENTS.md or docs/PROJECT.md.
 8. Setup only adds. Never overwrite, rename, migrate or disable another system's files or settings. Setup must be safe to run twice: before adding a line, section or link, check that it is not already there.
 
-## Step 0 — Bundled profiles (every mode)
+## Step 0 — Bundled profiles (every mode except update and installed)
 If this skill's folder contains `profiles/`, copy each file to `~/.agents/profiles/` (create the folder if missing) only if no file with that name exists there. Never overwrite a profile. Say in one line what was added and what was kept. If you received this prompt without the skill folder, skip this step; Step 3 can create profiles through the interview.
 
 ## Step 1 — User preferences (only if `~/.agents/USER.md` is missing, or in preferences mode)
@@ -64,7 +65,7 @@ Present the findings in one list with sources, and ask for confirmation once.
 
 ## Step 3 — Profiles
 1. List `~/.agents/profiles/*.md` with each file's `When:` line.
-2. **Profiles exist:** show the list and recommend a set from Step 2 (e.g. embedded detected → `code, embedded`). Ask which ones this project uses; several are allowed. Then ask whether the user writes the code to learn it (→ add `learning`, if that profile exists).
+2. **Profiles exist:** show the list and recommend a set from Step 2 (e.g. embedded detected → `code, embedded`). Ask which ones this project uses; several are allowed. Then ask whether the user does the work to learn it (recommended: no; yes → add `learning`, if that profile exists).
 3. **No profiles, or the work the user describes fits none:** say so and create one with a short interview, one question per message, at most five:
    1. What kind of work is it, and what is the result (e.g. firmware, web app, CV, presentation)?
    2. Who does the work: the agent, or the user while the agent teaches?
@@ -103,7 +104,7 @@ Use the templates below.
 - **Finishing:** fill every `TODO(setup)` you have an answer for. Move unanswered items to WORK.md › Open questions and delete their markers. In WORK.md › Next, put "Confirm open questions" or the user's first task.
 
 ## Step 6 — Finish
-- Check that AGENTS.md, docs/WORK.md and docs/PROJECT.md exist, that every profile in the `Profiles:` line exists in `~/.agents/profiles/`, and that no `TODO(setup)` markers remain. A listed profile that is missing: offer to create it with the Step 3 interview, or to remove it from the line.
+- Check that AGENTS.md, WORK.md and PROJECT.md exist (at their `Path override` paths, if any), that every profile in the `Profiles:` line exists in `~/.agents/profiles/`, and that no `TODO(setup)` markers remain. A listed profile that is missing: offer to create it with the Step 3 interview, or to remove it from the line.
 - Show the user: the decisions taken (and whether each was inferred or answered), the profiles used or created, the files created or changed, and the open questions.
 - Suggest a commit (`chore: add agent-lite working files`) and wait for approval if the Git rules require it.
 
