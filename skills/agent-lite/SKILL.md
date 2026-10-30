@@ -5,4 +5,9 @@ description: "Installs or updates agent-lite in a repository — AGENTS.md, docs
 
 agent-lite keeps an AI agent's plan, progress and project knowledge in your repository as plain Markdown, so any agent can continue the work in a new session. Git covers whatever was left unrecorded.
 
+What setup touches:
+- In the project: adds `AGENTS.md`, `docs/WORK.md`, `docs/PROJECT.md` and import files such as `CLAUDE.md`. Source code, build files and CI stay as they are.
+- In your home folder: adds `~/.agents/USER.md` and profiles and, with your approval, links `USER.md` from your agents' global instruction files, such as `~/.claude/CLAUDE.md`.
+- It shows a diff and waits for your approval before it changes any existing file. Project rules win over these preferences. Setup sends no data anywhere.
+
 Read `setup-prompt.md` in this skill's directory and follow it exactly. It is the single source of the setup steps and templates.
